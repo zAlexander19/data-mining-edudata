@@ -1,0 +1,5 @@
+cluster,age,study_hours,attendance,sleep_hours,previous_grade,assignments_completed,practice_tests_taken,group_study_hours,notes_quality_score,time_management_score,motivation_level,mental_health_score,screen_time,social_media_hours,final_grade,n,pct_fail,moda_family_income,moda_internet_access,moda_device_type
+0,16.49,4.45,84.63,7.02,69.88,7.82,4.03,1.53,7.56,4.32,7.62,6.97,4.03,2.55,50.79,43655,46.7,Medium,Yes,Laptop
+1,16.5,4.55,84.75,7.09,69.91,7.86,4.09,1.52,8.07,7.99,8.03,7.0,4.03,2.52,60.17,45206,18.0,Medium,Yes,Laptop
+2,16.51,4.53,84.81,7.01,69.88,7.83,3.97,1.53,4.62,6.8,7.34,6.97,4.0,2.54,51.46,41377,44.7,Medium,Yes,Laptop
+3,16.5,4.47,84.63,6.84,69.82,7.85,3.98,1.53,7.39,6.72,4.63,7.0,4.02,2.52,49.37,41096,51.7,Medium,Yes,Laptop

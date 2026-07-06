@@ -1,0 +1,94 @@
+|--- study_hours <= 4.59
+|   |--- time_management_score <= 6.84
+|   |   |--- motivation_level <= 7.16
+|   |   |   |--- assignments_completed <= 7.79
+|   |   |   |   |--- practice_tests_taken <= 3.92
+|   |   |   |   |   |--- truncated branch of depth 10
+|   |   |   |   |--- practice_tests_taken >  3.92
+|   |   |   |   |   |--- truncated branch of depth 11
+|   |   |   |--- assignments_completed >  7.79
+|   |   |   |   |--- study_hours <= 2.92
+|   |   |   |   |   |--- truncated branch of depth 12
+|   |   |   |   |--- study_hours >  2.92
+|   |   |   |   |   |--- truncated branch of depth 11
+|   |   |--- motivation_level >  7.16
+|   |   |   |--- assignments_completed <= 7.88
+|   |   |   |   |--- study_hours <= 2.57
+|   |   |   |   |   |--- truncated branch of depth 9
+|   |   |   |   |--- study_hours >  2.57
+|   |   |   |   |   |--- truncated branch of depth 11
+|   |   |   |--- assignments_completed >  7.88
+|   |   |   |   |--- study_hours <= 2.76
+|   |   |   |   |   |--- truncated branch of depth 9
+|   |   |   |   |--- study_hours >  2.76
+|   |   |   |   |   |--- truncated branch of depth 12
+|   |--- time_management_score >  6.84
+|   |   |--- motivation_level <= 6.76
+|   |   |   |--- assignments_completed <= 7.89
+|   |   |   |   |--- study_hours <= 2.39
+|   |   |   |   |   |--- truncated branch of depth 9
+|   |   |   |   |--- study_hours >  2.39
+|   |   |   |   |   |--- truncated branch of depth 11
+|   |   |   |--- assignments_completed >  7.89
+|   |   |   |   |--- study_hours <= 2.92
+|   |   |   |   |   |--- truncated branch of depth 9
+|   |   |   |   |--- study_hours >  2.92
+|   |   |   |   |   |--- truncated branch of depth 9
+|   |   |--- motivation_level >  6.76
+|   |   |   |--- assignments_completed <= 7.19
+|   |   |   |   |--- study_hours <= 2.31
+|   |   |   |   |   |--- truncated branch of depth 7
+|   |   |   |   |--- study_hours >  2.31
+|   |   |   |   |   |--- truncated branch of depth 9
+|   |   |   |--- assignments_completed >  7.19
+|   |   |   |   |--- study_hours <= 2.57
+|   |   |   |   |   |--- truncated branch of depth 10
+|   |   |   |   |--- study_hours >  2.57
+|   |   |   |   |   |--- truncated branch of depth 11
+|--- study_hours >  4.59
+|   |--- time_management_score <= 6.04
+|   |   |--- motivation_level <= 6.45
+|   |   |   |--- assignments_completed <= 7.90
+|   |   |   |   |--- study_hours <= 7.19
+|   |   |   |   |   |--- truncated branch of depth 11
+|   |   |   |   |--- study_hours >  7.19
+|   |   |   |   |   |--- truncated branch of depth 6
+|   |   |   |--- assignments_completed >  7.90
+|   |   |   |   |--- study_hours <= 6.27
+|   |   |   |   |   |--- truncated branch of depth 10
+|   |   |   |   |--- study_hours >  6.27
+|   |   |   |   |   |--- truncated branch of depth 9
+|   |   |--- motivation_level >  6.45
+|   |   |   |--- assignments_completed <= 7.49
+|   |   |   |   |--- study_hours <= 6.03
+|   |   |   |   |   |--- truncated branch of depth 10
+|   |   |   |   |--- study_hours >  6.03
+|   |   |   |   |   |--- truncated branch of depth 8
+|   |   |   |--- assignments_completed >  7.49
+|   |   |   |   |--- study_hours <= 6.60
+|   |   |   |   |   |--- truncated branch of depth 11
+|   |   |   |   |--- study_hours >  6.60
+|   |   |   |   |   |--- truncated branch of depth 8
+|   |--- time_management_score >  6.04
+|   |   |--- motivation_level <= 6.67
+|   |   |   |--- assignments_completed <= 7.33
+|   |   |   |   |--- study_hours <= 6.25
+|   |   |   |   |   |--- truncated branch of depth 10
+|   |   |   |   |--- study_hours >  6.25
+|   |   |   |   |   |--- truncated branch of depth 8
+|   |   |   |--- assignments_completed >  7.33
+|   |   |   |   |--- study_hours <= 6.52
+|   |   |   |   |   |--- truncated branch of depth 11
+|   |   |   |   |--- study_hours >  6.52
+|   |   |   |   |   |--- truncated branch of depth 9
+|   |   |--- motivation_level >  6.67
+|   |   |   |--- assignments_completed <= 6.75
+|   |   |   |   |--- study_hours <= 5.83
+|   |   |   |   |   |--- truncated branch of depth 8
+|   |   |   |   |--- study_hours >  5.83
+|   |   |   |   |   |--- truncated branch of depth 10
+|   |   |   |--- assignments_completed >  6.75
+|   |   |   |   |--- study_hours <= 6.02
+|   |   |   |   |   |--- truncated branch of depth 10
+|   |   |   |   |--- study_hours >  6.02
+|   |   |   |   |   |--- truncated branch of depth 11

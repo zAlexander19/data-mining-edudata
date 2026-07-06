@@ -1,0 +1,257 @@
+{
+  "barrido_k": [
+    {
+      "vista": "A_completa_31",
+      "k": 2,
+      "inercia": 630436.5,
+      "silueta": 0.1198
+    },
+    {
+      "vista": "A_completa_31",
+      "k": 3,
+      "inercia": 564470.1,
+      "silueta": 0.1247
+    },
+    {
+      "vista": "A_completa_31",
+      "k": 4,
+      "inercia": 531747.3,
+      "silueta": 0.1132
+    },
+    {
+      "vista": "A_completa_31",
+      "k": 5,
+      "inercia": 510966.0,
+      "silueta": 0.098
+    },
+    {
+      "vista": "A_completa_31",
+      "k": 6,
+      "inercia": 498581.6,
+      "silueta": 0.094
+    },
+    {
+      "vista": "A_completa_31",
+      "k": 7,
+      "inercia": 480687.2,
+      "silueta": 0.104
+    },
+    {
+      "vista": "A_completa_31",
+      "k": 8,
+      "inercia": 470268.2,
+      "silueta": 0.1025
+    },
+    {
+      "vista": "A_completa_31",
+      "k": 9,
+      "inercia": 456736.2,
+      "silueta": 0.1028
+    },
+    {
+      "vista": "A_completa_31",
+      "k": 10,
+      "inercia": 448829.7,
+      "silueta": 0.0973
+    },
+    {
+      "vista": "B_numerica_14",
+      "k": 2,
+      "inercia": 80617.5,
+      "silueta": 0.1759
+    },
+    {
+      "vista": "B_numerica_14",
+      "k": 3,
+      "inercia": 78008.7,
+      "silueta": 0.1077
+    },
+    {
+      "vista": "B_numerica_14",
+      "k": 4,
+      "inercia": 75416.1,
+      "silueta": 0.0615
+    },
+    {
+      "vista": "B_numerica_14",
+      "k": 5,
+      "inercia": 73666.9,
+      "silueta": 0.0577
+    },
+    {
+      "vista": "B_numerica_14",
+      "k": 6,
+      "inercia": 71922.5,
+      "silueta": 0.0565
+    },
+    {
+      "vista": "B_numerica_14",
+      "k": 7,
+      "inercia": 70578.3,
+      "silueta": 0.0539
+    },
+    {
+      "vista": "B_numerica_14",
+      "k": 8,
+      "inercia": 69224.5,
+      "silueta": 0.0534
+    },
+    {
+      "vista": "B_numerica_14",
+      "k": 9,
+      "inercia": 68170.2,
+      "silueta": 0.0533
+    },
+    {
+      "vista": "B_numerica_14",
+      "k": 10,
+      "inercia": 67113.0,
+      "silueta": 0.0525
+    },
+    {
+      "vista": "C_conductual_12",
+      "k": 2,
+      "inercia": 64878.1,
+      "silueta": 0.0744
+    },
+    {
+      "vista": "C_conductual_12",
+      "k": 3,
+      "inercia": 61394.1,
+      "silueta": 0.0643
+    },
+    {
+      "vista": "C_conductual_12",
+      "k": 4,
+      "inercia": 58689.6,
+      "silueta": 0.0617
+    },
+    {
+      "vista": "C_conductual_12",
+      "k": 5,
+      "inercia": 56576.1,
+      "silueta": 0.062
+    },
+    {
+      "vista": "C_conductual_12",
+      "k": 6,
+      "inercia": 55108.0,
+      "silueta": 0.0592
+    },
+    {
+      "vista": "C_conductual_12",
+      "k": 7,
+      "inercia": 54026.5,
+      "silueta": 0.0564
+    },
+    {
+      "vista": "C_conductual_12",
+      "k": 8,
+      "inercia": 53013.1,
+      "silueta": 0.0556
+    },
+    {
+      "vista": "C_conductual_12",
+      "k": 9,
+      "inercia": 52028.0,
+      "silueta": 0.057
+    },
+    {
+      "vista": "C_conductual_12",
+      "k": 10,
+      "inercia": 51171.8,
+      "silueta": 0.0564
+    }
+  ],
+  "vistas_descartadas": {
+    "A_completa_31_k3": {
+      "pct_fail_por_grupo": [
+        39.8,
+        39.6,
+        39.9
+      ],
+      "edad_media_por_grupo": [
+        16.5,
+        16.5,
+        16.5
+      ]
+    },
+    "B_numerica_14_k2": {
+      "pct_fail_por_grupo": [
+        39.6,
+        40.0
+      ],
+      "edad_media_por_grupo": [
+        15.5,
+        17.5
+      ]
+    }
+  },
+  "seleccion": {
+    "vista": "C_conductual_12",
+    "k": 4,
+    "silueta_por_k": {
+      "2": 0.0744,
+      "3": 0.0643,
+      "4": 0.0617,
+      "5": 0.062,
+      "6": 0.0592,
+      "7": 0.0564,
+      "8": 0.0556,
+      "9": 0.057,
+      "10": 0.0564
+    },
+    "criterio": "silueta casi plana y codo no concluyente; k=4 maximiza la interpretabilidad y la diferenciación del % de reprobación entre grupos; la vista usa SOLO hábitos: la nota no participa en la formación de los grupos"
+  },
+  "kmeans": {
+    "silueta": 0.0629,
+    "davies_bouldin": 2.7669,
+    "inercia": 58689.6,
+    "tamanos": [
+      43655,
+      45206,
+      41377,
+      41096
+    ]
+  },
+  "kmedoids": {
+    "silueta": 0.0445,
+    "davies_bouldin": 3.3767,
+    "costo_medio": 0.6071,
+    "tamanos": [
+      47618,
+      37545,
+      52542,
+      33629
+    ],
+    "medoides_student_id": [
+      133587,
+      130930,
+      51493,
+      34014
+    ]
+  },
+  "concordancia_ARI": 0.0871,
+  "coherencia_rendimiento_kmeans": {
+    "grupo_0": {
+      "Bajo": 39.6,
+      "Medio": 34.7,
+      "Alto": 25.7
+    },
+    "grupo_1": {
+      "Bajo": 13.3,
+      "Medio": 30.5,
+      "Alto": 56.2
+    },
+    "grupo_2": {
+      "Bajo": 37.6,
+      "Medio": 34.8,
+      "Alto": 27.6
+    },
+    "grupo_3": {
+      "Bajo": 44.4,
+      "Medio": 33.6,
+      "Alto": 22.0
+    }
+  }
+}

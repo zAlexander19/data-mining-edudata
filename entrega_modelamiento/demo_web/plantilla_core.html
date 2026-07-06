@@ -1,0 +1,472 @@
+<title>Sistema de Alerta Temprana — Demo del modelo</title>
+<style>
+  :root{
+    --papel:#f7f5f0; --superficie:#fcfcfb; --tinta:#181611; --tinta-2:#52514e;
+    --tinta-suave:#898781; --linea:#e1dfd6; --linea-fuerte:#c9c6ba;
+    --azul:#2a78d6; --rojo:#e34948; --neutro-div:#f0efec;
+    --ok:#0ca30c; --ok-bg:#e7f4e4; --warn:#fab219; --warn-bg:#fdf3d9;
+    --serio:#ec835a; --serio-bg:#fdeae2; --critico:#d03b3b; --critico-bg:#fae3e1;
+    --display:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+    --ui:Bahnschrift,"Segoe UI Semibold","Segoe UI",sans-serif;
+    --mono:Consolas,"Cascadia Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--papel); color:var(--tinta);
+    font-family:var(--ui); font-size:15px; line-height:1.45;
+    background-image:radial-gradient(rgba(24,22,17,.028) 1px, transparent 1px);
+    background-size:22px 22px;
+  }
+  .lienzo{max-width:1180px;margin:0 auto;padding:28px 28px 64px}
+
+  /* ---------- masthead ---------- */
+  header{border-bottom:3px double var(--linea-fuerte);padding-bottom:18px;margin-bottom:26px;
+         animation:aparecer .5s ease both}
+  .overline{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--tinta-suave)}
+  .titulo-fila{display:flex;flex-wrap:wrap;align-items:flex-end;gap:18px;justify-content:space-between;margin-top:6px}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,4vw,42px);line-height:1.05;letter-spacing:-.01em}
+  h1 em{font-style:italic;color:var(--azul)}
+  .subtitulo{color:var(--tinta-2);max-width:52ch;margin-top:8px;font-size:14px}
+  .presets{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .presets span{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--tinta-suave);margin-right:2px}
+  .preset{font-family:var(--ui);font-size:13px;border:1px solid var(--linea-fuerte);background:var(--superficie);
+          color:var(--tinta);padding:7px 13px;border-radius:999px;cursor:pointer;transition:all .15s ease}
+  .preset:hover{border-color:var(--tinta);transform:translateY(-1px);box-shadow:0 2px 0 var(--linea-fuerte)}
+  .preset.activo{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
+
+  /* ---------- layout ---------- */
+  main{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);gap:26px;align-items:start}
+  @media (max-width:920px){main{grid-template-columns:1fr}.panel{position:static}}
+
+  /* ---------- formulario ---------- */
+  .form{animation:aparecer .5s .08s ease both}
+  fieldset{border:1px solid var(--linea);background:var(--superficie);border-radius:10px;
+           padding:16px 18px 12px;margin-bottom:16px;box-shadow:0 1px 0 rgba(24,22,17,.04)}
+  legend{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--tinta-2);
+         padding:0 8px;background:var(--superficie);border:1px solid var(--linea);border-radius:999px}
+  .campo{display:grid;grid-template-columns:minmax(170px,46%) 1fr 76px;gap:12px;align-items:center;
+         padding:7px 0;border-bottom:1px dashed var(--linea)}
+  .campo:last-child{border-bottom:none}
+  .campo label{font-size:13.5px;color:var(--tinta);display:block}
+  .desc-mini{font-size:10.5px;line-height:1.35;color:var(--tinta-suave);margin-top:1px}
+  .campo .valor{font-family:var(--mono);font-size:12.5px;text-align:right;color:var(--tinta);
+                font-variant-numeric:tabular-nums;white-space:nowrap}
+  .campo .valor .uni{color:var(--tinta-suave);font-size:10.5px}
+  .slider-wrap{position:relative;height:26px;display:flex;align-items:center}
+  .slider-wrap .media-tick{position:absolute;top:2px;bottom:2px;width:2px;background:var(--linea-fuerte);
+                           left:var(--media-pos);border-radius:2px;pointer-events:none}
+  .slider-wrap .media-tick::after{content:"media";position:absolute;top:-3px;left:5px;font-size:8.5px;
+                                  letter-spacing:.08em;color:var(--tinta-suave);opacity:0;transition:opacity .15s}
+  .slider-wrap:hover .media-tick::after{opacity:1}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;
+                    background:linear-gradient(to right,var(--azul) 0%,var(--azul) var(--pos,50%),var(--linea) var(--pos,50%));
+                    outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+     background:var(--superficie);border:2.5px solid var(--tinta);box-shadow:0 1px 3px rgba(24,22,17,.25);
+     transition:transform .12s}
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.18)}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--superficie);
+     border:2.5px solid var(--tinta)}
+  select{font-family:var(--ui);font-size:13.5px;color:var(--tinta);background:var(--papel);
+         border:1px solid var(--linea-fuerte);border-radius:7px;padding:6px 8px;width:100%;cursor:pointer}
+  .campo-select{display:grid;grid-template-columns:minmax(170px,46%) 1fr;gap:12px;align-items:center;
+                padding:7px 0;border-bottom:1px dashed var(--linea)}
+  .campo-select:last-child{border-bottom:none}
+  .campo-select label{font-size:13.5px;color:var(--tinta);display:block}
+
+  /* ---------- panel diagnóstico ---------- */
+  .panel{position:sticky;top:20px;animation:aparecer .5s .16s ease both}
+  .diagnostico{background:var(--superficie);border:1.5px solid var(--tinta);border-radius:12px;
+               box-shadow:6px 6px 0 rgba(24,22,17,.08);overflow:hidden}
+  .diag-cab{display:flex;justify-content:space-between;align-items:center;
+            padding:12px 18px;border-bottom:1px solid var(--linea)}
+  .diag-cab .overline{color:var(--tinta-2)}
+  .sello{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave);
+         border:1px solid var(--linea-fuerte);border-radius:4px;padding:3px 7px}
+  .hero{padding:20px 18px 6px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .hero .numero{font-family:var(--mono);font-variant-numeric:tabular-nums;
+                font-size:clamp(52px,7vw,72px);font-weight:700;line-height:.95;letter-spacing:-.03em}
+  .hero .desc{font-size:13px;color:var(--tinta-2);max-width:16ch}
+  .chip-riesgo{display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:.1em;
+               text-transform:uppercase;font-weight:600;border-radius:999px;padding:6px 12px;margin:10px 18px 0}
+  .chip-riesgo .punto{width:9px;height:9px;border-radius:50%;flex:none}
+  .medidor{margin:16px 18px 4px;position:relative}
+  .medidor .pista{height:14px;border-radius:7px;background:var(--neutro-div);
+                  border:1px solid var(--linea);position:relative;overflow:hidden}
+  .medidor .relleno{position:absolute;inset:0;width:0%;border-radius:7px 0 0 7px;
+                    transition:width .45s cubic-bezier(.2,.8,.2,1), background-color .3s}
+  .medidor .umbral-tick{position:absolute;top:-5px;bottom:-5px;width:2.5px;background:var(--tinta);
+                        border-radius:2px;transition:left .2s}
+  .medidor .umbral-tick::after{content:"umbral";position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+                               font-size:9px;letter-spacing:.1em;color:var(--tinta-2)}
+  .medidor .escala{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;
+                   color:var(--tinta-suave);margin-top:5px}
+  .bloque{padding:14px 18px;border-top:1px solid var(--linea)}
+  .bloque h3{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-suave);margin-bottom:9px}
+  .alerta-linea{display:flex;align-items:center;gap:10px}
+  .badge{font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+         padding:7px 14px;border-radius:7px;border:1.5px solid}
+  .accion{font-size:13.5px;color:var(--tinta-2)}
+  .accion b{color:var(--tinta)}
+  .umbral-fila{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+  .umbral-fila .valor-umbral{font-family:var(--mono);font-size:15px;font-weight:700}
+  .umbral-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+  .stat{background:var(--papel);border:1px solid var(--linea);border-radius:8px;padding:8px 10px;text-align:center}
+  .stat .n{font-family:var(--mono);font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+  .stat .l{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta-suave);margin-top:2px}
+  .perfil-caja{background:var(--papel);border:1px solid var(--linea-fuerte);border-left:5px solid var(--azul);
+               border-radius:8px;padding:11px 13px}
+  .perfil-caja .nombre{font-family:var(--display);font-style:italic;font-size:17px}
+  .perfil-caja .detalle{font-size:12.5px;color:var(--tinta-2);margin-top:3px}
+
+  /* ---------- hábitos vs media (diverging) ---------- */
+  .viz-habitos .fila-h{display:grid;grid-template-columns:minmax(120px,38%) 1fr 44px;gap:10px;
+                       align-items:center;padding:3.5px 0}
+  .viz-habitos .fila-h .lbl{font-size:12px;color:var(--tinta-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .viz-habitos .fila-h .val{font-family:var(--mono);font-size:11.5px;text-align:right;color:var(--tinta-2);
+                            font-variant-numeric:tabular-nums}
+  .div-pista{position:relative;height:12px;background:var(--neutro-div);border-radius:6px;border:1px solid var(--linea)}
+  .div-pista::before{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1.5px;background:var(--linea-fuerte)}
+  .div-barra{position:absolute;top:2px;bottom:2px;border-radius:4px;transition:all .35s ease}
+  .polos{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.08em;
+         text-transform:uppercase;color:var(--tinta-suave);margin:4px 2px 0}
+
+  /* ---------- pie ---------- */
+  footer{margin-top:30px;border-top:3px double var(--linea-fuerte);padding-top:14px;
+         display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:space-between;align-items:baseline;
+         font-size:12px;color:var(--tinta-2);animation:aparecer .5s .24s ease both}
+  footer .metrica{font-family:var(--mono);color:var(--tinta)}
+  #autotest{font-size:11px;letter-spacing:.06em}
+  #autotest.ok{color:#006300}
+  #autotest.fallo{color:var(--critico);font-weight:700}
+  .aviso-fallo{display:none;background:var(--critico-bg);border:1.5px solid var(--critico);color:var(--tinta);
+               border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px}
+
+  @keyframes aparecer{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="lienzo">
+  <header>
+    <div class="overline">EduData Analytics · Proyecto Data Mining · Etapa VIII — Despliegue</div>
+    <div class="titulo-fila">
+      <div>
+        <h1>Sistema de <em>Alerta Temprana</em></h1>
+        <p class="subtitulo">Demo interactiva del modelo predictivo aprobado — Naïve Bayes balanceado,
+        entrenado <b>solo con hábitos</b> (sin ninguna calificación). Mueva los controles y el
+        diagnóstico se recalcula al instante.</p>
+      </div>
+      <div class="presets" id="presets">
+        <span>Casos:</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="aviso-fallo" id="avisoFallo">
+    ⚠ El autotest interno detectó diferencias con el modelo original. Los resultados podrían no ser fieles;
+    regenerar la demo con <code>scripts/06_generar_demo_web.py</code>.
+  </div>
+
+  <main>
+    <section class="form" id="formulario" aria-label="Encuesta de hábitos"></section>
+
+    <aside class="panel">
+      <div class="diagnostico" aria-live="polite">
+        <div class="diag-cab">
+          <span class="overline">Diagnóstico del estudiante</span>
+          <span class="sello">NB · test 80,2%</span>
+        </div>
+        <div class="hero">
+          <div class="numero" id="heroNum">—</div>
+          <div class="desc">probabilidad estimada de <b>reprobar</b></div>
+        </div>
+        <div class="chip-riesgo" id="chipRiesgo"><span class="punto"></span><span id="chipTxt">—</span></div>
+        <div class="medidor">
+          <div class="pista">
+            <div class="relleno" id="medidorRelleno"></div>
+          </div>
+          <div class="umbral-tick" id="umbralTick"></div>
+          <div class="escala"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+        </div>
+
+        <div class="bloque">
+          <h3>Alerta y acción</h3>
+          <div class="alerta-linea">
+            <span class="badge" id="badgeAlerta">—</span>
+            <span class="accion" id="accionTxt">—</span>
+          </div>
+        </div>
+
+        <div class="bloque">
+          <h3>Umbral de alerta · según capacidad de tutorías</h3>
+          <div class="umbral-fila">
+            <span class="valor-umbral" id="umbralVal">0,50</span>
+            <input type="range" id="umbralSlider" min="0.3" max="0.7" step="0.1" value="0.5"
+                   aria-label="Umbral de alerta">
+            <span style="font-size:11px;color:var(--tinta-suave)">nominal 0,50</span>
+          </div>
+          <div class="umbral-stats">
+            <div class="stat"><div class="n" id="statRecall">—</div><div class="l">reprobados detectados</div></div>
+            <div class="stat"><div class="n" id="statPrec">—</div><div class="l">alertas correctas</div></div>
+            <div class="stat"><div class="n" id="statVol">—</div><div class="l">alumnado alertado</div></div>
+          </div>
+        </div>
+
+        <div class="bloque">
+          <h3>Perfil conductual (K-Means, solo hábitos)</h3>
+          <div class="perfil-caja" id="perfilCaja">
+            <div class="nombre" id="perfilNombre">—</div>
+            <div class="detalle" id="perfilDetalle">—</div>
+          </div>
+        </div>
+
+        <div class="bloque viz-habitos">
+          <h3>Hábitos accionables vs. media poblacional</h3>
+          <div id="vizHabitos"></div>
+          <div class="polos"><span>◂ bajo la media</span><span>sobre la media ▸</span></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <div>
+      Modelo: <span class="metrica">Naïve Bayes mixto · submuestreo 50/50 · sin previous_grade</span>
+      &nbsp;·&nbsp; Prueba (n=25.701): <span class="metrica">accuracy 80,2% · recall Fail 81,2% · AUC 0,89</span>
+    </div>
+    <div>
+      Datos sintéticos (Kaggle) — demo metodológica &nbsp;·&nbsp; <span id="autotest">autotest…</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+/*NODE-TEST-START*/
+const MODELO = __MODELO_JSON__;
+
+function logGauss(x, mu, va){ return -0.5*Math.log(2*Math.PI*va) - ((x-mu)*(x-mu))/(2*va); }
+
+function predecir(vals){
+  const M = MODELO;
+  const jll = M.clases.map((c, k) => {
+    let s = Math.log(M.prior[k]);
+    M.numericas.forEach((col, j) => { s += logGauss(+vals[col], M.theta[k][j], M.varianza[k][j]); });
+    M.categoricas.forEach((col, j) => {
+      const idx = M.categorias[col].indexOf(String(vals[col]));
+      s += M.cat_logprob[j][k][idx];
+    });
+    return s;
+  });
+  const mx = Math.max(...jll);
+  const ex = jll.map(v => Math.exp(v - mx));
+  const pFail = ex[M.clases.indexOf("Fail")] / ex.reduce((a,b)=>a+b, 0);
+
+  let grupo = 0, mejor = Infinity;
+  M.centroides.forEach((cen, g) => {
+    let d = 0;
+    M.cols_cluster.forEach((col, j) => {
+      const r = M.rangos[col];
+      const z = (+vals[col] - r.min) / (r.max - r.min);
+      d += (z - cen[j]) * (z - cen[j]);
+    });
+    if (d < mejor){ mejor = d; grupo = g; }
+  });
+  return { pFail, grupo };
+}
+/*NODE-TEST-END*/
+
+// ---------------------------------------------------------------- estado y UI
+const $ = id => document.getElementById(id);
+const fmtPct = v => (v*100).toFixed(1).replace(".", ",") + " %";
+let umbral = 0.5;
+const estado = {};
+
+const SEVERIDAD = [
+  { max: .30, txt: "Riesgo bajo",     icono: "✓", color: "var(--ok)",      bg: "var(--ok-bg)" },
+  { max: .50, txt: "Riesgo moderado", icono: "◔", color: "var(--warn)",    bg: "var(--warn-bg)" },
+  { max: .75, txt: "Riesgo alto",     icono: "▲", color: "var(--serio)",   bg: "var(--serio-bg)" },
+  { max: 1.1, txt: "Riesgo crítico",  icono: "⬤", color: "var(--critico)", bg: "var(--critico-bg)" },
+];
+
+function fmtValor(col){
+  const v = MODELO.variables[col], val = +estado[col];
+  const txt = v.paso >= 1 ? String(Math.round(val)) : val.toFixed(1).replace(".", ",");
+  return `${txt} <span class="uni">${v.unidad}</span>`;
+}
+
+function sincronizar(col){          // slider/valor/relleno reflejan el estado
+  const inp = $("in_" + col);
+  if (!inp) return;
+  if (MODELO.numericas.includes(col)){
+    inp.value = estado[col];
+    const p = (inp.value - inp.min) / (inp.max - inp.min) * 100;
+    inp.style.setProperty("--pos", p + "%");
+    $("val_" + col).innerHTML = fmtValor(col);
+  } else {
+    inp.value = estado[col];
+  }
+}
+
+function construirFormulario(){
+  const cont = $("formulario");
+  MODELO.grupos_form.forEach(gr => {
+    const fs = document.createElement("fieldset");
+    fs.innerHTML = `<legend>${gr.titulo}</legend>`;
+    gr.campos.forEach(col => {
+      if (MODELO.numericas.includes(col)){
+        const v = MODELO.variables[col];
+        estado[col] = v.media;
+        const fila = document.createElement("div");
+        fila.className = "campo";
+        const mediaPos = ((v.media - v.min) / (v.max - v.min) * 100).toFixed(1);
+        fila.innerHTML =
+          `<div>
+             <label for="in_${col}">${v.etiqueta}</label>
+             <div class="desc-mini">${v.desc}</div>
+           </div>
+           <div class="slider-wrap">
+             <input type="range" id="in_${col}" min="${v.min}" max="${v.max}" step="${v.paso}" value="${v.media}"
+                    aria-label="${v.etiqueta}: ${v.desc}">
+             <div class="media-tick" style="--media-pos:${mediaPos}%"></div>
+           </div>
+           <div class="valor" id="val_${col}"></div>`;
+        fs.appendChild(fila);
+        const inp = fila.querySelector("input");
+        inp.addEventListener("input", () => {
+          estado[col] = +inp.value; sincronizar(col); refrescar();
+        });
+      } else {
+        const v = MODELO.variables[col];
+        estado[col] = MODELO.categorias[col][0];
+        const fila = document.createElement("div");
+        fila.className = "campo-select";
+        const opciones = MODELO.categorias[col].map(o =>
+          `<option value="${o}">${(MODELO.opciones_es[col] || {})[o] || o}</option>`).join("");
+        fila.innerHTML = `<div>
+            <label for="in_${col}">${v.etiqueta}</label>
+            <div class="desc-mini">${v.desc}</div>
+          </div>
+          <select id="in_${col}" aria-label="${v.etiqueta}: ${v.desc}">${opciones}</select>`;
+        fs.appendChild(fila);
+        fila.querySelector("select").addEventListener("change", e => {
+          estado[col] = e.target.value; refrescar();
+        });
+      }
+    });
+    cont.appendChild(fs);
+    gr.campos.forEach(sincronizar);   // recién ahora los controles están en el DOM
+  });
+}
+
+function aplicarPreset(p, boton){
+  Object.assign(estado, p.valores);
+  Object.keys(p.valores).forEach(sincronizar);
+  document.querySelectorAll(".preset").forEach(b => b.classList.remove("activo"));
+  if (boton) boton.classList.add("activo");
+  refrescar();
+}
+
+function construirPresets(){
+  const cont = $("presets");
+  MODELO.presets.forEach((p, i) => {
+    const b = document.createElement("button");
+    b.className = "preset";
+    b.textContent = p.nombre;
+    b.addEventListener("click", () => aplicarPreset(p, b));
+    cont.appendChild(b);
+    if (i === 0) setTimeout(() => aplicarPreset(p, b), 0);
+  });
+}
+
+function refrescar(){
+  const { pFail, grupo } = predecir(estado);
+  const pct = pFail * 100;
+
+  $("heroNum").textContent = pct.toFixed(1).replace(".", ",") + "%";
+  const sev = SEVERIDAD.find(s => pFail < s.max) || SEVERIDAD[SEVERIDAD.length - 1];
+  const chip = $("chipRiesgo");
+  chip.style.background = sev.bg;
+  chip.style.border = `1px solid ${sev.color}`;
+  chip.querySelector(".punto").style.background = sev.color;
+  $("chipTxt").textContent = `${sev.icono} ${sev.txt}`;
+
+  const rell = $("medidorRelleno");
+  rell.style.width = pct.toFixed(1) + "%";
+  rell.style.backgroundColor = sev.color;
+
+  const alerta = pFail >= umbral;
+  const badge = $("badgeAlerta");
+  badge.textContent = alerta ? "⚑ Alerta activada" : "✓ Sin alerta";
+  badge.style.color = alerta ? "var(--critico)" : "#006300";
+  badge.style.borderColor = alerta ? "var(--critico)" : "var(--ok)";
+  badge.style.background = alerta ? "var(--critico-bg)" : "var(--ok-bg)";
+
+  const perfil = MODELO.perfiles[grupo];
+  $("accionTxt").innerHTML = alerta
+    ? `Acción sugerida: <b>${perfil.accion}</b>`
+    : `Acción sugerida: <b>seguimiento regular</b>`;
+  $("perfilNombre").textContent = perfil.nombre;
+  $("perfilDetalle").textContent =
+    `Grupo ${grupo} · ${perfil.pct_alumnado} del alumnado · reprobación histórica del grupo: ${perfil.pct_fail}`;
+  $("perfilCaja").style.borderLeftColor = perfil.critico ? "var(--critico)" : "var(--azul)";
+
+  dibujarHabitos();
+}
+
+function dibujarHabitos(){
+  const cont = $("vizHabitos");
+  cont.innerHTML = "";
+  MODELO.accionables.forEach(col => {
+    const v = MODELO.variables[col];
+    const val = estado[col];
+    let dev = (val - v.media) / (v.max - v.min);      // desviación normalizada
+    dev = Math.max(-0.5, Math.min(0.5, dev));
+    const fila = document.createElement("div");
+    fila.className = "fila-h";
+    const barra = dev >= 0
+      ? `<div class="div-barra" style="left:50%;width:${dev*100}%;background:var(--azul)"></div>`
+      : `<div class="div-barra" style="right:50%;width:${-dev*100}%;background:var(--rojo)"></div>`;
+    fila.innerHTML = `<div class="lbl">${v.corta}</div>
+                      <div class="div-pista">${barra}</div>
+                      <div class="val">${(+val).toFixed(1).replace(".", ",")}</div>`;
+    cont.appendChild(fila);
+  });
+}
+
+function refrescarUmbral(){
+  umbral = +$("umbralSlider").value;
+  $("umbralVal").textContent = umbral.toFixed(2).replace(".", ",");
+  $("umbralTick").style.left = `calc(${umbral*100}% - 1px)`;
+  const fila = MODELO.umbral_stats.find(u => Math.abs(u.umbral - umbral) < .001);
+  if (fila){
+    $("statRecall").textContent = fila.recall.replace(".", ",") + "%";
+    $("statPrec").textContent  = fila.precision.replace(".", ",") + "%";
+    $("statVol").textContent   = fila.alumnado.replace(".", ",") + "%";
+  }
+  refrescar();
+}
+
+function autotest(){
+  let ok = 0;
+  MODELO.presets.forEach(p => {
+    const r = predecir(p.valores);
+    if (Math.abs(r.pFail*100 - p.esperado_pct) < 0.15 && r.grupo === p.esperado_grupo) ok++;
+  });
+  const el = $("autotest");
+  if (ok === MODELO.presets.length){
+    el.textContent = `autotest del modelo: OK (${ok}/${MODELO.presets.length} casos verificados vs. Python)`;
+    el.className = "ok";
+  } else {
+    el.textContent = `autotest del modelo: FALLO (${ok}/${MODELO.presets.length})`;
+    el.className = "fallo";
+    $("avisoFallo").style.display = "block";
+  }
+}
+
+construirFormulario();
+construirPresets();
+$("umbralSlider").addEventListener("input", refrescarUmbral);
+refrescarUmbral();
+autotest();
+</script>

@@ -1,0 +1,184 @@
+{
+  "split": {
+    "train": 119933,
+    "valid": 25700,
+    "test": 25701,
+    "pct_fail": {
+      "train": 0.3982,
+      "valid": 0.3982,
+      "test": 0.3982
+    }
+  },
+  "balanceo": {
+    "distribucion_train_original": {
+      "Pass": 72175,
+      "Fail": 47758
+    },
+    "distribucion_train_por_estrategia": {
+      "sobremuestreo": {
+        "Pass": 72175,
+        "Fail": 72175
+      },
+      "submuestreo": {
+        "Pass": 47758,
+        "Fail": 47758
+      }
+    },
+    "nota": "El balanceo se aplica SOLO al entrenamiento; validación y prueba conservan la distribución real (~60/40)."
+  },
+  "arbol": {
+    "final_balanceado": {
+      "estrategia_balanceo": "submuestreo",
+      "hiperparametros": {
+        "criterion": "entropy",
+        "max_depth": 16,
+        "min_samples_leaf": 50,
+        "class_weight": null
+      },
+      "hojas": 1653,
+      "profundidad": 16,
+      "validacion": {
+        "accuracy": 0.7356,
+        "recall_Fail": 0.7523
+      },
+      "test": {
+        "accuracy": 0.7325,
+        "precision_Fail": 0.6415,
+        "recall_Fail": 0.7442,
+        "f1_Fail": 0.689,
+        "precision_Pass": 0.8107,
+        "recall_Pass": 0.7248,
+        "f1_Pass": 0.7653,
+        "kappa": 0.4566,
+        "matriz_confusion": [
+          [
+            7616,
+            2618
+          ],
+          [
+            4257,
+            11210
+          ]
+        ],
+        "auc_roc": 0.8109
+      },
+      "cv5_accuracy_remuestreo_por_fold": [
+        0.7418,
+        0.7368,
+        0.7345,
+        0.7376,
+        0.7389
+      ]
+    },
+    "referencia_sin_balancear": {
+      "estrategia_balanceo": "original",
+      "hiperparametros": {
+        "criterion": "entropy",
+        "max_depth": 16,
+        "min_samples_leaf": 50,
+        "class_weight": null
+      },
+      "hojas": 2051,
+      "profundidad": 16,
+      "validacion": {
+        "accuracy": 0.7503,
+        "recall_Fail": 0.6613
+      },
+      "test": {
+        "accuracy": 0.7475,
+        "precision_Fail": 0.6925,
+        "recall_Fail": 0.6582,
+        "f1_Fail": 0.6749,
+        "precision_Pass": 0.781,
+        "recall_Pass": 0.8066,
+        "f1_Pass": 0.7936,
+        "kappa": 0.4687,
+        "matriz_confusion": [
+          [
+            6736,
+            3498
+          ],
+          [
+            2991,
+            12476
+          ]
+        ],
+        "auc_roc": 0.8159
+      }
+    }
+  },
+  "naive_bayes": {
+    "final_balanceado": {
+      "estrategia_balanceo": "submuestreo",
+      "hiperparametros": {
+        "var_smoothing": 1e-09,
+        "alpha": 0.1
+      },
+      "validacion": {
+        "accuracy": 0.8014,
+        "recall_Fail": 0.8162
+      },
+      "test": {
+        "accuracy": 0.8018,
+        "precision_Fail": 0.724,
+        "recall_Fail": 0.8119,
+        "f1_Fail": 0.7654,
+        "precision_Pass": 0.8647,
+        "recall_Pass": 0.7952,
+        "f1_Pass": 0.8285,
+        "kappa": 0.5949,
+        "matriz_confusion": [
+          [
+            8309,
+            1925
+          ],
+          [
+            3168,
+            12299
+          ]
+        ],
+        "auc_roc": 0.8891
+      },
+      "cv5_accuracy_remuestreo_por_fold": [
+        0.8044,
+        0.8036,
+        0.8026,
+        0.8041,
+        0.8012
+      ]
+    },
+    "referencia_sin_balancear": {
+      "estrategia_balanceo": "original",
+      "hiperparametros": {
+        "var_smoothing": 1e-09,
+        "alpha": 0.1
+      },
+      "validacion": {
+        "accuracy": 0.8075,
+        "recall_Fail": 0.6874
+      },
+      "test": {
+        "accuracy": 0.805,
+        "precision_Fail": 0.7988,
+        "recall_Fail": 0.6821,
+        "f1_Fail": 0.7359,
+        "precision_Pass": 0.8082,
+        "recall_Pass": 0.8863,
+        "f1_Pass": 0.8455,
+        "kappa": 0.5829,
+        "matriz_confusion": [
+          [
+            6981,
+            3253
+          ],
+          [
+            1758,
+            13709
+          ]
+        ],
+        "auc_roc": 0.889
+      }
+    }
+  },
+  "baseline_clase_mayoritaria": 0.6018
+}

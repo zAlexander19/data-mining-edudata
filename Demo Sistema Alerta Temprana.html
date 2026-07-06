@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<title>Sistema de Alerta Temprana — Demo del modelo</title>
+<style>
+  :root{
+    --papel:#f7f5f0; --superficie:#fcfcfb; --tinta:#181611; --tinta-2:#52514e;
+    --tinta-suave:#898781; --linea:#e1dfd6; --linea-fuerte:#c9c6ba;
+    --azul:#2a78d6; --rojo:#e34948; --neutro-div:#f0efec;
+    --ok:#0ca30c; --ok-bg:#e7f4e4; --warn:#fab219; --warn-bg:#fdf3d9;
+    --serio:#ec835a; --serio-bg:#fdeae2; --critico:#d03b3b; --critico-bg:#fae3e1;
+    --display:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+    --ui:Bahnschrift,"Segoe UI Semibold","Segoe UI",sans-serif;
+    --mono:Consolas,"Cascadia Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--papel); color:var(--tinta);
+    font-family:var(--ui); font-size:15px; line-height:1.45;
+    background-image:radial-gradient(rgba(24,22,17,.028) 1px, transparent 1px);
+    background-size:22px 22px;
+  }
+  .lienzo{max-width:1180px;margin:0 auto;padding:28px 28px 64px}
+
+  /* ---------- masthead ---------- */
+  header{border-bottom:3px double var(--linea-fuerte);padding-bottom:18px;margin-bottom:26px;
+         animation:aparecer .5s ease both}
+  .overline{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--tinta-suave)}
+  .titulo-fila{display:flex;flex-wrap:wrap;align-items:flex-end;gap:18px;justify-content:space-between;margin-top:6px}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,4vw,42px);line-height:1.05;letter-spacing:-.01em}
+  h1 em{font-style:italic;color:var(--azul)}
+  .subtitulo{color:var(--tinta-2);max-width:52ch;margin-top:8px;font-size:14px}
+  .presets{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .presets span{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--tinta-suave);margin-right:2px}
+  .preset{font-family:var(--ui);font-size:13px;border:1px solid var(--linea-fuerte);background:var(--superficie);
+          color:var(--tinta);padding:7px 13px;border-radius:999px;cursor:pointer;transition:all .15s ease}
+  .preset:hover{border-color:var(--tinta);transform:translateY(-1px);box-shadow:0 2px 0 var(--linea-fuerte)}
+  .preset.activo{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
+
+  /* ---------- layout ---------- */
+  main{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);gap:26px;align-items:start}
+  @media (max-width:920px){main{grid-template-columns:1fr}.panel{position:static}}
+
+  /* ---------- formulario ---------- */
+  .form{animation:aparecer .5s .08s ease both}
+  fieldset{border:1px solid var(--linea);background:var(--superficie);border-radius:10px;
+           padding:16px 18px 12px;margin-bottom:16px;box-shadow:0 1px 0 rgba(24,22,17,.04)}
+  legend{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--tinta-2);
+         padding:0 8px;background:var(--superficie);border:1px solid var(--linea);border-radius:999px}
+  .campo{display:grid;grid-template-columns:minmax(170px,46%) 1fr 76px;gap:12px;align-items:center;
+         padding:7px 0;border-bottom:1px dashed var(--linea)}
+  .campo:last-child{border-bottom:none}
+  .campo label{font-size:13.5px;color:var(--tinta);display:block}
+  .desc-mini{font-size:10.5px;line-height:1.35;color:var(--tinta-suave);margin-top:1px}
+  .campo .valor{font-family:var(--mono);font-size:12.5px;text-align:right;color:var(--tinta);
+                font-variant-numeric:tabular-nums;white-space:nowrap}
+  .campo .valor .uni{color:var(--tinta-suave);font-size:10.5px}
+  .slider-wrap{position:relative;height:26px;display:flex;align-items:center}
+  .slider-wrap .media-tick{position:absolute;top:2px;bottom:2px;width:2px;background:var(--linea-fuerte);
+                           left:var(--media-pos);border-radius:2px;pointer-events:none}
+  .slider-wrap .media-tick::after{content:"media";position:absolute;top:-3px;left:5px;font-size:8.5px;
+                                  letter-spacing:.08em;color:var(--tinta-suave);opacity:0;transition:opacity .15s}
+  .slider-wrap:hover .media-tick::after{opacity:1}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;
+                    background:linear-gradient(to right,var(--azul) 0%,var(--azul) var(--pos,50%),var(--linea) var(--pos,50%));
+                    outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+     background:var(--superficie);border:2.5px solid var(--tinta);box-shadow:0 1px 3px rgba(24,22,17,.25);
+     transition:transform .12s}
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.18)}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--superficie);
+     border:2.5px solid var(--tinta)}
+  select{font-family:var(--ui);font-size:13.5px;color:var(--tinta);background:var(--papel);
+         border:1px solid var(--linea-fuerte);border-radius:7px;padding:6px 8px;width:100%;cursor:pointer}
+  .campo-select{display:grid;grid-template-columns:minmax(170px,46%) 1fr;gap:12px;align-items:center;
+                padding:7px 0;border-bottom:1px dashed var(--linea)}
+  .campo-select:last-child{border-bottom:none}
+  .campo-select label{font-size:13.5px;color:var(--tinta);display:block}
+
+  /* ---------- panel diagnóstico ---------- */
+  .panel{position:sticky;top:20px;animation:aparecer .5s .16s ease both}
+  .diagnostico{background:var(--superficie);border:1.5px solid var(--tinta);border-radius:12px;
+               box-shadow:6px 6px 0 rgba(24,22,17,.08);overflow:hidden}
+  .diag-cab{display:flex;justify-content:space-between;align-items:center;
+            padding:12px 18px;border-bottom:1px solid var(--linea)}
+  .diag-cab .overline{color:var(--tinta-2)}
+  .sello{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave);
+         border:1px solid var(--linea-fuerte);border-radius:4px;padding:3px 7px}
+  .hero{padding:20px 18px 6px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .hero .numero{font-family:var(--mono);font-variant-numeric:tabular-nums;
+                font-size:clamp(52px,7vw,72px);font-weight:700;line-height:.95;letter-spacing:-.03em}
+  .hero .desc{font-size:13px;color:var(--tinta-2);max-width:16ch}
+  .chip-riesgo{display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:.1em;
+               text-transform:uppercase;font-weight:600;border-radius:999px;padding:6px 12px;margin:10px 18px 0}
+  .chip-riesgo .punto{width:9px;height:9px;border-radius:50%;flex:none}
+  .medidor{margin:16px 18px 4px;position:relative}
+  .medidor .pista{height:14px;border-radius:7px;background:var(--neutro-div);
+                  border:1px solid var(--linea);position:relative;overflow:hidden}
+  .medidor .relleno{position:absolute;inset:0;width:0%;border-radius:7px 0 0 7px;
+                    transition:width .45s cubic-bezier(.2,.8,.2,1), background-color .3s}
+  .medidor .umbral-tick{position:absolute;top:-5px;bottom:-5px;width:2.5px;background:var(--tinta);
+                        border-radius:2px;transition:left .2s}
+  .medidor .umbral-tick::after{content:"umbral";position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+                               font-size:9px;letter-spacing:.1em;color:var(--tinta-2)}
+  .medidor .escala{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;
+                   color:var(--tinta-suave);margin-top:5px}
+  .bloque{padding:14px 18px;border-top:1px solid var(--linea)}
+  .bloque h3{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--tinta-suave);margin-bottom:9px}
+  .alerta-linea{display:flex;align-items:center;gap:10px}
+  .badge{font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+         padding:7px 14px;border-radius:7px;border:1.5px solid}
+  .accion{font-size:13.5px;color:var(--tinta-2)}
+  .accion b{color:var(--tinta)}
+  .umbral-fila{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+  .umbral-fila .valor-umbral{font-family:var(--mono);font-size:15px;font-weight:700}
+  .umbral-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+  .stat{background:var(--papel);border:1px solid var(--linea);border-radius:8px;padding:8px 10px;text-align:center}
+  .stat .n{font-family:var(--mono);font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+  .stat .l{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta-suave);margin-top:2px}
+  .perfil-caja{background:var(--papel);border:1px solid var(--linea-fuerte);border-left:5px solid var(--azul);
+               border-radius:8px;padding:11px 13px}
+  .perfil-caja .nombre{font-family:var(--display);font-style:italic;font-size:17px}
+  .perfil-caja .detalle{font-size:12.5px;color:var(--tinta-2);margin-top:3px}
+
+  /* ---------- hábitos vs media (diverging) ---------- */
+  .viz-habitos .fila-h{display:grid;grid-template-columns:minmax(120px,38%) 1fr 44px;gap:10px;
+                       align-items:center;padding:3.5px 0}
+  .viz-habitos .fila-h .lbl{font-size:12px;color:var(--tinta-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .viz-habitos .fila-h .val{font-family:var(--mono);font-size:11.5px;text-align:right;color:var(--tinta-2);
+                            font-variant-numeric:tabular-nums}
+  .div-pista{position:relative;height:12px;background:var(--neutro-div);border-radius:6px;border:1px solid var(--linea)}
+  .div-pista::before{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1.5px;background:var(--linea-fuerte)}
+  .div-barra{position:absolute;top:2px;bottom:2px;border-radius:4px;transition:all .35s ease}
+  .polos{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.08em;
+         text-transform:uppercase;color:var(--tinta-suave);margin:4px 2px 0}
+
+  /* ---------- pie ---------- */
+  footer{margin-top:30px;border-top:3px double var(--linea-fuerte);padding-top:14px;
+         display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:space-between;align-items:baseline;
+         font-size:12px;color:var(--tinta-2);animation:aparecer .5s .24s ease both}
+  footer .metrica{font-family:var(--mono);color:var(--tinta)}
+  #autotest{font-size:11px;letter-spacing:.06em}
+  #autotest.ok{color:#006300}
+  #autotest.fallo{color:var(--critico);font-weight:700}
+  .aviso-fallo{display:none;background:var(--critico-bg);border:1.5px solid var(--critico);color:var(--tinta);
+               border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px}
+
+  @keyframes aparecer{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="lienzo">
+  <header>
+    <div class="overline">EduData Analytics · Proyecto Data Mining · Etapa VIII — Despliegue</div>
+    <div class="titulo-fila">
+      <div>
+        <h1>Sistema de <em>Alerta Temprana</em></h1>
+        <p class="subtitulo">Demo interactiva del modelo predictivo aprobado — Naïve Bayes balanceado,
+        entrenado <b>solo con hábitos</b> (sin ninguna calificación). Mueva los controles y el
+        diagnóstico se recalcula al instante.</p>
+      </div>
+      <div class="presets" id="presets">
+        <span>Casos:</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="aviso-fallo" id="avisoFallo">
+    ⚠ El autotest interno detectó diferencias con el modelo original. Los resultados podrían no ser fieles;
+    regenerar la demo con <code>scripts/06_generar_demo_web.py</code>.
+  </div>
+
+  <main>
+    <section class="form" id="formulario" aria-label="Encuesta de hábitos"></section>
+
+    <aside class="panel">
+      <div class="diagnostico" aria-live="polite">
+        <div class="diag-cab">
+          <span class="overline">Diagnóstico del estudiante</span>
+          <span class="sello">NB · test 80,2%</span>
+        </div>
+        <div class="hero">
+          <div class="numero" id="heroNum">—</div>
+          <div class="desc">probabilidad estimada de <b>reprobar</b></div>
+        </div>
+        <div class="chip-riesgo" id="chipRiesgo"><span class="punto"></span><span id="chipTxt">—</span></div>
+        <div class="medidor">
+          <div class="pista">
+            <div class="relleno" id="medidorRelleno"></div>
+          </div>
+          <div class="umbral-tick" id="umbralTick"></div>
+          <div class="escala"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+        </div>
+
+        <div class="bloque">
+          <h3>Alerta y acción</h3>
+          <div class="alerta-linea">
+            <span class="badge" id="badgeAlerta">—</span>
+            <span class="accion" id="accionTxt">—</span>
+          </div>
+        </div>
+
+        <div class="bloque">
+          <h3>Umbral de alerta · según capacidad de tutorías</h3>
+          <div class="umbral-fila">
+            <span class="valor-umbral" id="umbralVal">0,50</span>
+            <input type="range" id="umbralSlider" min="0.3" max="0.7" step="0.1" value="0.5"
+                   aria-label="Umbral de alerta">
+            <span style="font-size:11px;color:var(--tinta-suave)">nominal 0,50</span>
+          </div>
+          <div class="umbral-stats">
+            <div class="stat"><div class="n" id="statRecall">—</div><div class="l">reprobados detectados</div></div>
+            <div class="stat"><div class="n" id="statPrec">—</div><div class="l">alertas correctas</div></div>
+            <div class="stat"><div class="n" id="statVol">—</div><div class="l">alumnado alertado</div></div>
+          </div>
+        </div>
+
+        <div class="bloque">
+          <h3>Perfil conductual (K-Means, solo hábitos)</h3>
+          <div class="perfil-caja" id="perfilCaja">
+            <div class="nombre" id="perfilNombre">—</div>
+            <div class="detalle" id="perfilDetalle">—</div>
+          </div>
+        </div>
+
+        <div class="bloque viz-habitos">
+          <h3>Hábitos accionables vs. media poblacional</h3>
+          <div id="vizHabitos"></div>
+          <div class="polos"><span>◂ bajo la media</span><span>sobre la media ▸</span></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <div>
+      Modelo: <span class="metrica">Naïve Bayes mixto · submuestreo 50/50 · sin previous_grade</span>
+      &nbsp;·&nbsp; Prueba (n=25.701): <span class="metrica">accuracy 80,2% · recall Fail 81,2% · AUC 0,89</span>
+    </div>
+    <div>
+      Datos sintéticos (Kaggle) — demo metodológica &nbsp;·&nbsp; <span id="autotest">autotest…</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+/*NODE-TEST-START*/
+const MODELO = {"clases": ["Fail", "Pass"], "prior": [0.5, 0.5], "numericas": ["age", "study_hours", "attendance", "sleep_hours", "assignments_completed", "practice_tests_taken", "group_study_hours", "notes_quality_score", "time_management_score", "motivation_level", "mental_health_score", "screen_time", "social_media_hours"], "categoricas": ["family_income", "parent_education", "internet_access", "school_type", "gender", "device_type", "extracurriculars"], "theta": [[16.506328459097805, 3.676679296686853, 82.86788115260325, 6.817142544643057, 7.3595268679702395, 3.620380311667414, 1.4615281460283602, 6.563771922674393, 5.869583787741545, 6.386037668602297, 6.756798985392109, 4.313562965510552, 2.7619544015607302], [16.49544764795144, 5.0477729095749755, 85.91907401661413, 7.115494049872805, 8.163319609296403, 4.288060922228196, 1.5756447566553489, 7.191782821265378, 6.860486290999992, 7.316728604106069, 7.124584301567942, 3.829254845712485, 2.3773562514481124]], "varianza": [[1.2446834500864319, 3.3492775048926955, 91.13807800418746, 2.1547544952493016, 3.276528228477912, 3.6328642925278163, 0.8688849002491854, 3.648024754798562, 3.6253972839197757, 3.5971708370758466, 2.1406816382442657, 3.8034571676134403, 2.0941142315200674], [1.2515313036456552, 3.5391543344940444, 82.91984294562162, 2.0990421050995, 2.562007819821943, 3.7992151458803165, 0.8901061668601169, 3.36277232551646, 3.3942506018062906, 3.1640894329780016, 2.1148391276257392, 3.749496655316233, 1.9915422750915661]], "cat_logprob": [[[-1.6184763828734159, -1.0444763673519617, -0.798677656593652], [-1.6018245736823236, -1.0487489127217149, -0.8027484634334154]], [[-1.0407606335008577, -0.8010968245589858, -1.9130832809073635, -2.9886941052087614], [-1.0526955904504511, -0.79489230907663, -1.8912468386022478, -3.0263804322841166]], [[-1.8910148471700499, -0.16360018656077813], [-1.9022753216581236, -0.16161191669412212]], [[-1.0443276389260436, -0.43375403747449504], [-1.0437888088600058, -0.43404676505897477]], [[-0.7323970704260585, -0.7348031103850516, -3.2277925011047692], [-0.7318233490022656, -0.7355944175578166, -3.225186183657028]], [[-0.6058550590639307, -1.1916122498085961, -2.9900648603666804, -2.2988227201570197], [-0.6021956450916317, -1.1984482862509989, -2.9866414891139934, -2.2998539847505732]], [[-1.7704002488064638, -1.792725576202928, -1.8033450344665365, -1.8020898173060917, -1.7838587160353594, -1.7985419011135058], [-1.7960450468913738, -1.7817054432553796, -1.7953179705371038, -1.7877669395822036, -1.78047708020158, -1.8095395401320467]]], "categorias": {"family_income": ["High", "Low", "Medium"], "parent_education": ["Bachelor", "High School", "Master", "PhD"], "internet_access": ["No", "Yes"], "school_type": ["Private", "Public"], "gender": ["Female", "Male", "Other"], "device_type": ["Laptop", "Mobile", "None", "Tablet"], "extracurriculars": ["Arts", "Coding Club", "Debate", "Music", "None", "Sports"]}, "centroides": [[0.3703865047340783, 0.7437058013138131, 0.5741945785098301, 0.7818632171780745, 0.4031473306754822, 0.2624488841368533, 0.7291063382414108, 0.3694239924006738, 0.7360411651525763, 0.6633984799662016, 0.33596421124251596, 0.3185030484628628], [0.3794767096176216, 0.7458374418285868, 0.5851760174719923, 0.786279646481569, 0.40910112196671655, 0.26106960537213914, 0.7854905118283511, 0.7774824358099096, 0.7810107180786472, 0.6666770351445165, 0.3358530324224057, 0.31508840720992226], [0.3776889001483867, 0.746956003118579, 0.5728510757479088, 0.7826540820456378, 0.39725823838639157, 0.2614345822728541, 0.4018634046177558, 0.6439301318084616, 0.704843202715539, 0.6630819743402107, 0.3334506159180165, 0.3177544850607343], [0.37230720204382184, 0.7438598830842175, 0.5474534286066516, 0.7850232361469607, 0.3982300346680043, 0.2624131821002998, 0.7099860546041998, 0.6351936404951875, 0.40367103973501917, 0.6664993262953656, 0.3346357826023297, 0.3144759704348883]], "cols_cluster": ["study_hours", "attendance", "sleep_hours", "assignments_completed", "practice_tests_taken", "group_study_hours", "notes_quality_score", "time_management_score", "motivation_level", "mental_health_score", "screen_time", "social_media_hours"], "rangos": {"motivation_level": {"min": 1.0, "max": 10.0}, "practice_tests_taken": {"min": 0.0, "max": 10.0}, "sleep_hours": {"min": 3.0, "max": 10.0}, "age": {"min": 15.0, "max": 18.0}, "group_study_hours": {"min": 0.0, "max": 5.84059342578304}, "social_media_hours": {"min": 0.0, "max": 8.0}, "notes_quality_score": {"min": 1.0, "max": 10.0}, "screen_time": {"min": 0.0, "max": 12.0}, "attendance": {"min": 40.0, "max": 100.0}, "study_hours": {"min": 0.0, "max": 12.0}, "assignments_completed": {"min": 0.0, "max": 10.0}, "time_management_score": {"min": 1.0, "max": 10.0}, "mental_health_score": {"min": 1.0, "max": 10.0}}, "variables": {"age": {"etiqueta": "Edad", "corta": "Edad", "desc": "edad del estudiante, en años cumplidos", "min": 15.0, "max": 18.0, "paso": 1, "media": 16.5, "unidad": "años"}, "study_hours": {"etiqueta": "Horas de estudio", "corta": "Horas de estudio", "desc": "horas DIARIAS dedicadas al estudio individual, fuera de clases", "min": 0.0, "max": 12.0, "paso": 0.1, "media": 4.5, "unidad": "h/día"}, "attendance": {"etiqueta": "Asistencia", "corta": "Asistencia", "desc": "porcentaje de asistencia a clases en el período", "min": 40.0, "max": 100.0, "paso": 1, "media": 84.7, "unidad": "%"}, "sleep_hours": {"etiqueta": "Horas de sueño", "corta": "Sueño", "desc": "horas de sueño diarias (promedio por noche)", "min": 3.0, "max": 10.0, "paso": 0.1, "media": 7.0, "unidad": "h/día"}, "assignments_completed": {"etiqueta": "Cumplimiento de tareas", "corta": "Tareas", "desc": "escala 0–10: nivel de entrega de tareas y trabajos (0 = ninguna · 10 = todas)", "min": 0.0, "max": 10.0, "paso": 0.1, "media": 7.8, "unidad": "/ 10"}, "practice_tests_taken": {"etiqueta": "Ensayos de práctica", "corta": "Ensayos", "desc": "escala 0–10: cantidad e intensidad de ensayos o tests de práctica rendidos", "min": 0.0, "max": 10.0, "paso": 0.1, "media": 4.0, "unidad": "/ 10"}, "group_study_hours": {"etiqueta": "Estudio en grupo", "corta": "Estudio en grupo", "desc": "horas diarias de estudio en grupo (además del individual)", "min": 0.0, "max": 5.84059342578304, "paso": 0.1, "media": 1.5, "unidad": "h/día"}, "notes_quality_score": {"etiqueta": "Calidad de apuntes", "corta": "Apuntes", "desc": "escala 1–10: calidad de los apuntes propios (1 = deficientes · 10 = excelentes)", "min": 1.0, "max": 10.0, "paso": 0.1, "media": 6.9, "unidad": "/ 10"}, "time_management_score": {"etiqueta": "Gestión del tiempo", "corta": "Gestión del tiempo", "desc": "escala 1–10: capacidad de organizar y planificar el tiempo (autoevaluación)", "min": 1.0, "max": 10.0, "paso": 0.1, "media": 6.5, "unidad": "/ 10"}, "motivation_level": {"etiqueta": "Motivación", "corta": "Motivación", "desc": "escala 1–10: nivel de motivación declarado por el estudiante", "min": 1.0, "max": 10.0, "paso": 0.1, "media": 7.0, "unidad": "/ 10"}, "mental_health_score": {"etiqueta": "Salud mental", "corta": "Salud mental", "desc": "escala 1–10: estado de salud mental autopercibido", "min": 1.0, "max": 10.0, "paso": 0.1, "media": 7.0, "unidad": "/ 10"}, "screen_time": {"etiqueta": "Tiempo de pantalla", "corta": "Pantalla", "desc": "horas diarias frente a pantallas, uso general (estudio y ocio)", "min": 0.0, "max": 12.0, "paso": 0.1, "media": 4.0, "unidad": "h/día"}, "social_media_hours": {"etiqueta": "Redes sociales", "corta": "Redes sociales", "desc": "horas diarias en redes sociales (parte del tiempo de pantalla)", "min": 0.0, "max": 8.0, "paso": 0.1, "media": 2.5, "unidad": "h/día"}, "gender": {"etiqueta": "Género", "corta": "Género", "desc": "género autoidentificado"}, "family_income": {"etiqueta": "Ingreso familiar", "corta": "Ingreso", "desc": "nivel de ingreso del hogar (bajo / medio / alto)"}, "parent_education": {"etiqueta": "Educación de los padres", "corta": "Educ. padres", "desc": "máximo nivel educativo alcanzado por los padres"}, "internet_access": {"etiqueta": "Acceso a internet", "corta": "Internet", "desc": "disponibilidad de internet en el hogar"}, "device_type": {"etiqueta": "Dispositivo principal", "corta": "Dispositivo", "desc": "dispositivo principal con el que estudia"}, "school_type": {"etiqueta": "Tipo de establecimiento", "corta": "Establecimiento", "desc": "establecimiento público o privado"}, "extracurriculars": {"etiqueta": "Actividad extracurricular", "corta": "Extracurricular", "desc": "actividad extracurricular principal del estudiante"}}, "opciones_es": {"gender": {"Female": "Femenino", "Male": "Masculino", "Other": "Otro"}, "family_income": {"Low": "Bajo", "Medium": "Medio", "High": "Alto"}, "parent_education": {"High School": "Educación secundaria", "Bachelor": "Pregrado", "Master": "Magíster", "PhD": "Doctorado"}, "internet_access": {"No": "No", "Yes": "Sí"}, "device_type": {"Laptop": "Notebook", "Mobile": "Celular", "Tablet": "Tablet", "None": "Sin dispositivo propio"}, "school_type": {"Public": "Público", "Private": "Privado"}, "extracurriculars": {"Arts": "Arte", "Coding Club": "Club de programación", "Debate": "Debate", "Music": "Música", "Sports": "Deportes", "None": "Ninguna"}}, "grupos_form": [{"titulo": "Hábitos de estudio", "campos": ["study_hours", "assignments_completed", "practice_tests_taken", "group_study_hours", "notes_quality_score"]}, {"titulo": "Organización y ánimo", "campos": ["time_management_score", "motivation_level", "mental_health_score"]}, {"titulo": "Rutina diaria", "campos": ["attendance", "sleep_hours", "screen_time", "social_media_hours"]}, {"titulo": "Contexto", "campos": ["age", "gender", "family_income", "parent_education", "internet_access", "device_type", "school_type", "extracurriculars"]}], "accionables": ["study_hours", "attendance", "sleep_hours", "assignments_completed", "practice_tests_taken", "notes_quality_score", "time_management_score", "motivation_level"], "perfiles": [{"nombre": "Riesgo por gestión del tiempo deficiente", "accion": "taller de planificación y organización", "pct_alumnado": "25,5%", "pct_fail": "46,7%", "critico": true}, {"nombre": "Alto desempeño autónomo", "accion": "mantención / mentor par", "pct_alumnado": "26,4%", "pct_fail": "18,0%", "critico": false}, {"nombre": "Riesgo por calidad de apuntes deficiente", "accion": "técnicas de estudio y toma de apuntes", "pct_alumnado": "24,2%", "pct_fail": "44,7%", "critico": true}, {"nombre": "Riesgo por desmotivación", "accion": "programa motivacional y consejería", "pct_alumnado": "24,0%", "pct_fail": "51,7%", "critico": true}], "presets": [{"nombre": "Promedio", "valores": {"age": 16, "study_hours": 4.5, "attendance": 84.7, "sleep_hours": 7.0, "assignments_completed": 7.8, "practice_tests_taken": 4.0, "group_study_hours": 1.5, "notes_quality_score": 6.9, "time_management_score": 6.5, "motivation_level": 7.0, "mental_health_score": 7.0, "screen_time": 4.0, "social_media_hours": 2.5, "gender": "Female", "family_income": "Medium", "parent_education": "Bachelor", "internet_access": "Yes", "device_type": "Laptop", "school_type": "Public", "extracurriculars": "None"}, "esperado_pct": 38.15, "esperado_grupo": 1}, {"nombre": "A · hábitos sólidos", "valores": {"age": 16, "gender": "Female", "study_hours": 7.5, "attendance": 95, "sleep_hours": 8, "assignments_completed": 9.5, "practice_tests_taken": 7, "group_study_hours": 2, "notes_quality_score": 8.5, "time_management_score": 8.5, "motivation_level": 9, "mental_health_score": 8, "screen_time": 2.5, "social_media_hours": 1.5, "family_income": "Medium", "parent_education": "Bachelor", "internet_access": "Yes", "device_type": "Laptop", "school_type": "Public", "extracurriculars": "Sports"}, "esperado_pct": 0.69, "esperado_grupo": 1}, {"nombre": "B · desmotivado", "valores": {"age": 17, "gender": "Male", "study_hours": 5.0, "attendance": 85, "sleep_hours": 7, "assignments_completed": 8, "practice_tests_taken": 4, "group_study_hours": 1.5, "notes_quality_score": 7, "time_management_score": 7, "motivation_level": 2, "mental_health_score": 5, "screen_time": 5, "social_media_hours": 3, "family_income": "Medium", "parent_education": "Master", "internet_access": "Yes", "device_type": "Mobile", "school_type": "Private", "extracurriculars": "None"}, "esperado_pct": 81.66, "esperado_grupo": 3}, {"nombre": "C · desorganizado", "valores": {"age": 15, "gender": "Other", "study_hours": 1.0, "attendance": 78, "sleep_hours": 6, "assignments_completed": 6, "practice_tests_taken": 2, "group_study_hours": 0.5, "notes_quality_score": 5, "time_management_score": 3, "motivation_level": 6, "mental_health_score": 7, "screen_time": 7, "social_media_hours": 5, "family_income": "Low", "parent_education": "High School", "internet_access": "No", "device_type": "None", "school_type": "Public", "extracurriculars": "None"}, "esperado_pct": 99.33, "esperado_grupo": 0}], "umbral_stats": [{"umbral": 0.3, "recall": "95.9", "precision": "56.6", "alumnado": "67.4"}, {"umbral": 0.4, "recall": "90.2", "precision": "64.7", "alumnado": "55.6"}, {"umbral": 0.5, "recall": "81.2", "precision": "72.4", "alumnado": "44.7"}, {"umbral": 0.6, "recall": "68.5", "precision": "79.7", "alumnado": "34.2"}, {"umbral": 0.7, "recall": "52.9", "precision": "86.6", "alumnado": "24.3"}]};
+
+function logGauss(x, mu, va){ return -0.5*Math.log(2*Math.PI*va) - ((x-mu)*(x-mu))/(2*va); }
+
+function predecir(vals){
+  const M = MODELO;
+  const jll = M.clases.map((c, k) => {
+    let s = Math.log(M.prior[k]);
+    M.numericas.forEach((col, j) => { s += logGauss(+vals[col], M.theta[k][j], M.varianza[k][j]); });
+    M.categoricas.forEach((col, j) => {
+      const idx = M.categorias[col].indexOf(String(vals[col]));
+      s += M.cat_logprob[j][k][idx];
+    });
+    return s;
+  });
+  const mx = Math.max(...jll);
+  const ex = jll.map(v => Math.exp(v - mx));
+  const pFail = ex[M.clases.indexOf("Fail")] / ex.reduce((a,b)=>a+b, 0);
+
+  let grupo = 0, mejor = Infinity;
+  M.centroides.forEach((cen, g) => {
+    let d = 0;
+    M.cols_cluster.forEach((col, j) => {
+      const r = M.rangos[col];
+      const z = (+vals[col] - r.min) / (r.max - r.min);
+      d += (z - cen[j]) * (z - cen[j]);
+    });
+    if (d < mejor){ mejor = d; grupo = g; }
+  });
+  return { pFail, grupo };
+}
+/*NODE-TEST-END*/
+
+// ---------------------------------------------------------------- estado y UI
+const $ = id => document.getElementById(id);
+const fmtPct = v => (v*100).toFixed(1).replace(".", ",") + " %";
+let umbral = 0.5;
+const estado = {};
+
+const SEVERIDAD = [
+  { max: .30, txt: "Riesgo bajo",     icono: "✓", color: "var(--ok)",      bg: "var(--ok-bg)" },
+  { max: .50, txt: "Riesgo moderado", icono: "◔", color: "var(--warn)",    bg: "var(--warn-bg)" },
+  { max: .75, txt: "Riesgo alto",     icono: "▲", color: "var(--serio)",   bg: "var(--serio-bg)" },
+  { max: 1.1, txt: "Riesgo crítico",  icono: "⬤", color: "var(--critico)", bg: "var(--critico-bg)" },
+];
+
+function fmtValor(col){
+  const v = MODELO.variables[col], val = +estado[col];
+  const txt = v.paso >= 1 ? String(Math.round(val)) : val.toFixed(1).replace(".", ",");
+  return `${txt} <span class="uni">${v.unidad}</span>`;
+}
+
+function sincronizar(col){          // slider/valor/relleno reflejan el estado
+  const inp = $("in_" + col);
+  if (!inp) return;
+  if (MODELO.numericas.includes(col)){
+    inp.value = estado[col];
+    const p = (inp.value - inp.min) / (inp.max - inp.min) * 100;
+    inp.style.setProperty("--pos", p + "%");
+    $("val_" + col).innerHTML = fmtValor(col);
+  } else {
+    inp.value = estado[col];
+  }
+}
+
+function construirFormulario(){
+  const cont = $("formulario");
+  MODELO.grupos_form.forEach(gr => {
+    const fs = document.createElement("fieldset");
+    fs.innerHTML = `<legend>${gr.titulo}</legend>`;
+    gr.campos.forEach(col => {
+      if (MODELO.numericas.includes(col)){
+        const v = MODELO.variables[col];
+        estado[col] = v.media;
+        const fila = document.createElement("div");
+        fila.className = "campo";
+        const mediaPos = ((v.media - v.min) / (v.max - v.min) * 100).toFixed(1);
+        fila.innerHTML =
+          `<div>
+             <label for="in_${col}">${v.etiqueta}</label>
+             <div class="desc-mini">${v.desc}</div>
+           </div>
+           <div class="slider-wrap">
+             <input type="range" id="in_${col}" min="${v.min}" max="${v.max}" step="${v.paso}" value="${v.media}"
+                    aria-label="${v.etiqueta}: ${v.desc}">
+             <div class="media-tick" style="--media-pos:${mediaPos}%"></div>
+           </div>
+           <div class="valor" id="val_${col}"></div>`;
+        fs.appendChild(fila);
+        const inp = fila.querySelector("input");
+        inp.addEventListener("input", () => {
+          estado[col] = +inp.value; sincronizar(col); refrescar();
+        });
+      } else {
+        const v = MODELO.variables[col];
+        estado[col] = MODELO.categorias[col][0];
+        const fila = document.createElement("div");
+        fila.className = "campo-select";
+        const opciones = MODELO.categorias[col].map(o =>
+          `<option value="${o}">${(MODELO.opciones_es[col] || {})[o] || o}</option>`).join("");
+        fila.innerHTML = `<div>
+            <label for="in_${col}">${v.etiqueta}</label>
+            <div class="desc-mini">${v.desc}</div>
+          </div>
+          <select id="in_${col}" aria-label="${v.etiqueta}: ${v.desc}">${opciones}</select>`;
+        fs.appendChild(fila);
+        fila.querySelector("select").addEventListener("change", e => {
+          estado[col] = e.target.value; refrescar();
+        });
+      }
+    });
+    cont.appendChild(fs);
+    gr.campos.forEach(sincronizar);   // recién ahora los controles están en el DOM
+  });
+}
+
+function aplicarPreset(p, boton){
+  Object.assign(estado, p.valores);
+  Object.keys(p.valores).forEach(sincronizar);
+  document.querySelectorAll(".preset").forEach(b => b.classList.remove("activo"));
+  if (boton) boton.classList.add("activo");
+  refrescar();
+}
+
+function construirPresets(){
+  const cont = $("presets");
+  MODELO.presets.forEach((p, i) => {
+    const b = document.createElement("button");
+    b.className = "preset";
+    b.textContent = p.nombre;
+    b.addEventListener("click", () => aplicarPreset(p, b));
+    cont.appendChild(b);
+    if (i === 0) setTimeout(() => aplicarPreset(p, b), 0);
+  });
+}
+
+function refrescar(){
+  const { pFail, grupo } = predecir(estado);
+  const pct = pFail * 100;
+
+  $("heroNum").textContent = pct.toFixed(1).replace(".", ",") + "%";
+  const sev = SEVERIDAD.find(s => pFail < s.max) || SEVERIDAD[SEVERIDAD.length - 1];
+  const chip = $("chipRiesgo");
+  chip.style.background = sev.bg;
+  chip.style.border = `1px solid ${sev.color}`;
+  chip.querySelector(".punto").style.background = sev.color;
+  $("chipTxt").textContent = `${sev.icono} ${sev.txt}`;
+
+  const rell = $("medidorRelleno");
+  rell.style.width = pct.toFixed(1) + "%";
+  rell.style.backgroundColor = sev.color;
+
+  const alerta = pFail >= umbral;
+  const badge = $("badgeAlerta");
+  badge.textContent = alerta ? "⚑ Alerta activada" : "✓ Sin alerta";
+  badge.style.color = alerta ? "var(--critico)" : "#006300";
+  badge.style.borderColor = alerta ? "var(--critico)" : "var(--ok)";
+  badge.style.background = alerta ? "var(--critico-bg)" : "var(--ok-bg)";
+
+  const perfil = MODELO.perfiles[grupo];
+  $("accionTxt").innerHTML = alerta
+    ? `Acción sugerida: <b>${perfil.accion}</b>`
+    : `Acción sugerida: <b>seguimiento regular</b>`;
+  $("perfilNombre").textContent = perfil.nombre;
+  $("perfilDetalle").textContent =
+    `Grupo ${grupo} · ${perfil.pct_alumnado} del alumnado · reprobación histórica del grupo: ${perfil.pct_fail}`;
+  $("perfilCaja").style.borderLeftColor = perfil.critico ? "var(--critico)" : "var(--azul)";
+
+  dibujarHabitos();
+}
+
+function dibujarHabitos(){
+  const cont = $("vizHabitos");
+  cont.innerHTML = "";
+  MODELO.accionables.forEach(col => {
+    const v = MODELO.variables[col];
+    const val = estado[col];
+    let dev = (val - v.media) / (v.max - v.min);      // desviación normalizada
+    dev = Math.max(-0.5, Math.min(0.5, dev));
+    const fila = document.createElement("div");
+    fila.className = "fila-h";
+    const barra = dev >= 0
+      ? `<div class="div-barra" style="left:50%;width:${dev*100}%;background:var(--azul)"></div>`
+      : `<div class="div-barra" style="right:50%;width:${-dev*100}%;background:var(--rojo)"></div>`;
+    fila.innerHTML = `<div class="lbl">${v.corta}</div>
+                      <div class="div-pista">${barra}</div>
+                      <div class="val">${(+val).toFixed(1).replace(".", ",")}</div>`;
+    cont.appendChild(fila);
+  });
+}
+
+function refrescarUmbral(){
+  umbral = +$("umbralSlider").value;
+  $("umbralVal").textContent = umbral.toFixed(2).replace(".", ",");
+  $("umbralTick").style.left = `calc(${umbral*100}% - 1px)`;
+  const fila = MODELO.umbral_stats.find(u => Math.abs(u.umbral - umbral) < .001);
+  if (fila){
+    $("statRecall").textContent = fila.recall.replace(".", ",") + "%";
+    $("statPrec").textContent  = fila.precision.replace(".", ",") + "%";
+    $("statVol").textContent   = fila.alumnado.replace(".", ",") + "%";
+  }
+  refrescar();
+}
+
+function autotest(){
+  let ok = 0;
+  MODELO.presets.forEach(p => {
+    const r = predecir(p.valores);
+    if (Math.abs(r.pFail*100 - p.esperado_pct) < 0.15 && r.grupo === p.esperado_grupo) ok++;
+  });
+  const el = $("autotest");
+  if (ok === MODELO.presets.length){
+    el.textContent = `autotest del modelo: OK (${ok}/${MODELO.presets.length} casos verificados vs. Python)`;
+    el.className = "ok";
+  } else {
+    el.textContent = `autotest del modelo: FALLO (${ok}/${MODELO.presets.length})`;
+    el.className = "fallo";
+    $("avisoFallo").style.display = "block";
+  }
+}
+
+construirFormulario();
+construirPresets();
+$("umbralSlider").addEventListener("input", refrescarUmbral);
+refrescarUmbral();
+autotest();
+</script>
+
+</body>
+</html>

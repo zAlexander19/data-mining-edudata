@@ -1,0 +1,58 @@
+{
+  "age": {
+    "min": 15.0,
+    "max": 18.0
+  },
+  "study_hours": {
+    "min": 0.0,
+    "max": 12.0
+  },
+  "attendance": {
+    "min": 40.0,
+    "max": 100.0
+  },
+  "sleep_hours": {
+    "min": 3.0,
+    "max": 10.0
+  },
+  "previous_grade": {
+    "min": 20.0,
+    "max": 100.0
+  },
+  "assignments_completed": {
+    "min": 0.0,
+    "max": 10.0
+  },
+  "practice_tests_taken": {
+    "min": 0.0,
+    "max": 10.0
+  },
+  "group_study_hours": {
+    "min": 0.0,
+    "max": 5.84059342578304
+  },
+  "notes_quality_score": {
+    "min": 1.0,
+    "max": 10.0
+  },
+  "time_management_score": {
+    "min": 1.0,
+    "max": 10.0
+  },
+  "motivation_level": {
+    "min": 1.0,
+    "max": 10.0
+  },
+  "mental_health_score": {
+    "min": 1.0,
+    "max": 10.0
+  },
+  "screen_time": {
+    "min": 0.0,
+    "max": 12.0
+  },
+  "social_media_hours": {
+    "min": 0.0,
+    "max": 8.0
+  }
+}
