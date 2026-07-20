@@ -1,0 +1,30 @@
+Esta es una síntesis detallada de la retroalimentación recibida en tu presentación de inteligencia de negocios y machine learning:
+
+### 1. Definición de Objetivos
+*   **De tareas a objetivos:** El profesor señaló que la diapositiva de objetivos está muy orientada a la "tarea" (qué van a hacer) y no al "objetivo de minería de datos". 
+*   **Redacción técnica:** Sugiere redactar el objetivo de forma más profesional. Ejemplo: *"Construir un modelo con capacidad predictiva para determinar si un estudiante aprobará o no, con una precisión/exactitud superior al 80%"*.
+*   **Optimización:** Recomienda adaptar la diapositiva actual en lugar de agregar una nueva para evitar redundancias.
+
+### 2. Vistas Minables (Vistas de Datos)
+*   **Estructura y Visualización:** Es necesario incluir capturas de pantalla que muestren claramente la estructura de las vistas minables. 
+*   **Legibilidad:** Criticó el contraste visual; los números y etiquetas (como "Medium", "High") deben ser más legibles y destacar más sobre el fondo.
+*   **Alcance:** Sugiere mostrar la vista minable completa (con todas las columnas/variables) y no solo extractos, para dimensionar la complejidad del trabajo.
+*   **Bitácora de proceso:** Recomienda mencionar que probaron varias vistas minables y explicar por qué se quedaron con la que dio mejores resultados, mostrando así el proceso de experimentación.
+
+### 3. Visualización de Modelos y Resultados
+*   **Árbol de Decisión:** Las reglas y derivaciones no se aprecian bien debido al tamaño. Sugiere una diapositiva donde se pueda ver el árbol de cerca o destacar las reglas principales.
+*   **Matriz de Confusión:** Es demasiado pequeña e ilegible. Debe agrandarse para ocupar el espacio disponible y que los números sean claros.
+*   **Test de Hopkins:** Se validó su uso para reforzar el "porqué" de los resultados obtenidos en el clustering.
+
+### 4. Análisis de Resultados vs. Despliegue
+*   **Mostrar experimentos:** El profesor notó que saltaron directamente al resultado final (K=4). Es fundamental mostrar los experimentos previos (resultados con K=2, K=3, etc.).
+*   **Diagrama de Codo (Elbow Method):** Deben incluir este diagrama para justificar técnicamente por qué eligieron ese número de clusters. El análisis de resultados debe mostrar las diferentes opciones probadas antes de llegar a la conclusión.
+
+### 5. Calidad de las Conclusiones
+*   **Interpretación, no resumen:** Las conclusiones actuales parecen un resumen de resultados. Una verdadera conclusión debe razonar sobre el fenómeno.
+*   **El "Porqué":** Deben explicar por qué creen que ciertos grupos tienen alto rendimiento o por qué se dan ciertos patrones. Se busca un razonamiento basado en los hallazgos, no solo una lista de lo que hizo el modelo.
+*   **Recomendaciones:** El punto sobre "riesgo" se consideró más una recomendación que una conclusión técnica.
+
+### 6. Otros puntos
+*   **Asistencia:** Hubo un recordatorio serio/irónico sobre el cumplimiento del porcentaje de asistencia para tener derecho a la presentación final.
+*   **Gráficos:** Se elogió la visualización de los grupos (basada en K=4), pero se reiteró que deben mostrarse en el contexto de la comparativa con otros modelos.

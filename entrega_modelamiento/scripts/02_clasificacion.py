@@ -400,15 +400,17 @@ def main():
         cm = confusion_matrix(y_te, pred, labels=["Fail", "Pass"])
         ConfusionMatrixDisplay(cm, display_labels=["Fail (Reprueba)", "Pass (Aprueba)"]) \
             .plot(ax=ax, colorbar=False, values_format=",d", cmap="Blues")
-        ax.set_title(f"{nombre}\naccuracy={res['test']['accuracy']:.3f} · "
-                     f"recall Fail={res['test']['recall_Fail']:.3f}")
+        for t in ax.texts:  # separador de miles con punto (convención del informe)
+            t.set_text(t.get_text().replace(",", "."))
+        ax.set_title((f"{nombre}\naccuracy={res['test']['accuracy']:.3f} · "
+                      f"recall Fail={res['test']['recall_Fail']:.3f}").replace(".", ","))
     fig.suptitle("Matrices de confusión — conjunto de prueba (n=%s), modelos balanceados"
                  % f"{len(y_te):,}".replace(",", "."))
     fig.tight_layout()
     fig.savefig(FIGURAS / "clasificacion_matrices_confusion.png", bbox_inches="tight")
     plt.close(fig)
 
-    fig, ax = plt.subplots(figsize=(16, 8))
+    fig, ax = plt.subplots(figsize=(21, 8))
     plot_tree(arbol, feature_names=list(X_arbol.columns), class_names=arbol.classes_,
               filled=True, max_depth=3, fontsize=8, impurity=False, proportion=True, ax=ax)
     ax.set_title(f"Árbol de decisión (entropía, balanceo por {best.estrategia}) — primeros 3 niveles")

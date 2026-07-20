@@ -270,7 +270,8 @@ def main():
                              for i in range(K)])
     for i in range(K):
         for j in range(len(NUMERICAS)):
-            ax.text(j, i, f"{z.iloc[i, j]:+.1f}", ha="center", va="center", fontsize=7)
+            ax.text(j, i, f"{z.iloc[i, j]:+.1f}".replace(".", ","), ha="center", va="center",
+                    fontsize=7, color="white" if abs(z.iloc[i, j]) > 0.75 else "black")
     ax.set_title("Perfil de cada grupo (K-Means) — desviación de la media global (z-score)")
     fig.colorbar(im, shrink=0.8)
     fig.tight_layout()
